@@ -1,4 +1,3 @@
-
 'use client'
 import World from "@/lib/webgl/world";
 
@@ -12,15 +11,6 @@ export default function Home() {
   ];
 
   const menu = ["HOME", "ABOUT", "WORKS", "ARTWORK"];
-
-  const menuStyle = {
-    fontSize: "14px",
-    letterSpacing: "3px",
-    borderBottom: "1px solid rgba(255,255,255,0.35)",
-    paddingBottom: "6px",
-    cursor: "pointer",
-    transition: "all 0.3s ease",
-  };
 
   const neonStyle = {
     color: "#e6ffff",
@@ -36,17 +26,12 @@ export default function Home() {
   };
 
   return (
-    <div
-      style={{
-        position: "relative",
-        width: "100vw",
-        height: "100vh",
-        overflow: "hidden",
-        fontFamily: "Arial, Helvetica, sans-serif",
-      }}
-    >
-      {/* Flickering neon animation */}
+    <div className="container">
       <style jsx global>{`
+        body {
+          margin: 0;
+        }
+
         @keyframes brokenFlicker {
           0% { opacity: 1; }
           4% { opacity: 0.4; }
@@ -66,54 +51,110 @@ export default function Home() {
           83% { opacity: 1; }
           100% { opacity: 1; }
         }
+
+        .container {
+          position: relative;
+          width: 100vw;
+          height: 100vh;
+          overflow: hidden;
+          font-family: Arial, Helvetica, sans-serif;
+        }
+
+        .menu {
+          position: absolute;
+          top: 20%;
+          left: 90px;
+          transform: translateY(-50%);
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 28px;
+          color: #cfcfcf;
+        }
+
+        .menuItem {
+          font-size: 14px;
+          letter-spacing: 3px;
+          border-bottom: 1px solid rgba(255,255,255,0.35);
+          padding-bottom: 6px;
+          cursor: pointer;
+          transition: all 0.3s ease;
+        }
+
+        .centerText {
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          display: flex;
+          align-items: center;
+          gap: 14px;
+          font-size: 4vw;
+          letter-spacing: 2vw;
+        }
+
+        .subText {
+          position: absolute;
+          top: 58%;
+          left: 50%;
+          transform: translate(-50%, -0%);
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 10px;
+          font-size: 1.5vw;
+          letter-spacing: 0.8vw;
+        }
+
+        /* MOBILE */
+        @media (max-width: 768px) {
+
+          .menu {
+            top: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            flex-direction: row;
+            gap: 20px;
+          }
+
+          .menuItem {
+            font-size: 12px;
+            letter-spacing: 2px;
+          }
+
+          .centerText {
+            font-size: 10vw;
+            letter-spacing: 4vw;
+          }
+
+          .subText {
+            font-size: 4vw;
+            letter-spacing: 2vw;
+            top: 62%;
+          }
+        }
       `}</style>
 
       {/* WebGL background */}
       <World img="/main.jpg" />
 
-      {/* Left vertical menu */}
-      <div
-        style={{
-          position: "absolute",
-          top: "20%",
-          left: "90px",
-          transform: "translateY(-50%)",
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          gap: "28px",
-          color: "#cfcfcf",
-        }}
-      >
+      {/* Menu */}
+      <div className="menu">
         {menu.map((item) => (
-          <div key={item} style={menuStyle}>
+          <div key={item} className="menuItem">
             {item}
           </div>
         ))}
       </div>
 
-      {/* Center neon text */}
-      <div
-        style={{
-          position: "absolute",
-          top: "50%",
-          left: "50%",
-          transform: "translate(-50%, -50%)",
-          display: "flex",
-          alignItems: "center",
-          gap: "14px",
-          fontSize: "48px",
-          letterSpacing: "50px",
-        }}
-      >
+      {/* HELLO WORLD */}
+      <div className="centerText">
         {hello.map((letter, i) => (
           <span
             key={i}
             style={{
               display: "inline-block",
               transform: letter.mirrored ? "scaleX(-1)" : "none",
-              paddingBottom: "6px",
-              animationDelay: `${i * 0.4}s`,
               ...neonStyle,
             }}
           >
@@ -121,17 +162,20 @@ export default function Home() {
           </span>
         ))}
 
-        <span
-          style={{
-            marginLeft: "24px",
-            paddingBottom: "6px",
-            animationDelay: "2s",
-            ...neonStyle,
-          }}
-        >
+        <span style={{ marginLeft: "2vw", ...neonStyle }}>
           WORLD
         </span>
       </div>
+
+      {/* Name + Japanese */}
+      <div className="subText">
+        <div>KELVIN BENO</div>
+
+        <span>
+          デベロッパー
+        </span>
+      </div>
+
     </div>
   );
 }
