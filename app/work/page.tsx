@@ -88,10 +88,10 @@ export default function Works() {
 
       <div
         style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
-          gap: "40px",
-          maxWidth: "1100px",
+          display: "flex",
+          flexDirection: "column",
+          gap: "60px",
+          maxWidth: "800px",
           margin: "0 auto",
           paddingBottom: "100px"
         }}
@@ -108,13 +108,14 @@ export default function Works() {
             <div
               ref={addToRefs}
               style={{
+                display: "flex",
+                gap: "20px",
                 background: "#111",
                 borderRadius: "12px",
                 overflow: "hidden",
                 cursor: "pointer",
-                display: "flex",
-                flexDirection: "column",
-                height: "100%",
+                flexDirection: "row",
+                alignItems: "flex-start",
                 transition: "transform 0.3s, box-shadow 0.3s",
               }}
               onMouseEnter={(e) => {
@@ -129,7 +130,7 @@ export default function Works() {
               <img
                 src={work.image}
                 alt={work.title}
-                style={{ width: "100%", objectFit: "cover", height: "180px" }}
+                style={{ width: "180px", height: "120px", objectFit: "cover", flexShrink: 0 }}
               />
               <div style={{ padding: "20px" }}>
                 <h3 style={{ margin: "0 0 10px 0", fontWeight: "400", fontSize: "18px" }}>

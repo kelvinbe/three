@@ -60,7 +60,9 @@ export default function Menu() {
               ? "/"
               : item === "ABOUT"
               ? "/about"
-              : "#"
+              : item === "WORKS"
+              ? "/work"
+              : "/artwork"
           }
           style={{ textDecoration: "none", color: "inherit" }}
         >
