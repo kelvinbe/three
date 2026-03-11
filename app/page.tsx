@@ -1,3 +1,4 @@
+
 import World from "@/lib/webgl/world";
 
 export default function Home() {
@@ -9,32 +10,66 @@ export default function Home() {
     { char: "O", mirrored: false },
   ];
 
+  const menu = ["HOME", "ABOUT", "WORKS", "ARTWORK"];
+
+  const menuStyle = {
+    fontSize: "14px",
+    letterSpacing: "3px",
+    borderBottom: "1px solid rgba(255,255,255,0.35)",
+    paddingBottom: "6px",
+    cursor: "pointer",
+    transition: "all 0.3s ease",
+  };
+
   return (
-    <div style={{ position: "relative", width: "100vw", height: "100vh" }}>
+    <div
+      style={{
+        position: "relative",
+        width: "100vw",
+        height: "100vh",
+        overflow: "hidden",
+        fontFamily: "sans-serif",
+      }}
+    >
       {/* WebGL background */}
       <World img="/main.jpg" />
 
-      {/* Menu on the left, vertical center */}
+      {/* Left vertical menu */}
       <div
         style={{
           position: "absolute",
           top: "20%",
-          left: "20px",
+          left: "90px",
           transform: "translateY(-50%)",
           display: "flex",
           flexDirection: "column",
-          gap: "20px",
-          color: "#fff",
-          fontFamily: "sans-serif",
-          fontSize: "18px",
+          alignItems: "center",
+          gap: "28px",
+          color: "#cfcfcf",
         }}
       >
-        <div>Home</div>
-        <div>About</div>
-        <div>Works</div>
+
+        {menu.map((item) => (
+          <div
+            key={item}
+            style={menuStyle}
+            // onMouseEnter={(e) => {
+            //   e.currentTarget.style.color = "#fff";
+            //   e.currentTarget.style.borderBottom =
+            //     "1px solid rgba(255,255,255,0.9)";
+            // }}
+            // onMouseLeave={(e) => {
+            //   e.currentTarget.style.color = "#cfcfcf";
+            //   e.currentTarget.style.borderBottom =
+            //     "1px solid rgba(255,255,255,0.35)";
+            // }}
+          >
+            {item}
+          </div>
+        ))}
       </div>
 
-      {/* Centered text */}
+      {/* Center text */}
       <div
         style={{
           position: "absolute",
@@ -42,31 +77,36 @@ export default function Home() {
           left: "50%",
           transform: "translate(-50%, -50%)",
           display: "flex",
-          flexDirection: "row",
           alignItems: "center",
-          gap: "10px",
-          fontFamily: "sans-serif",
-          color: "#fff",
-          fontSize: "64px",
-          fontWeight: "bold",
+          gap: "14px",
+          color: "#cfcfcf",
+          fontSize: "48px",
+          letterSpacing: "6px",
         }}
       >
-        {/* HELLO with only ELL mirrored */}
         {hello.map((letter, i) => (
           <span
             key={i}
             style={{
               display: "inline-block",
               transform: letter.mirrored ? "scaleX(-1)" : "none",
+              paddingBottom: "6px",
             }}
           >
             {letter.char}
           </span>
         ))}
 
-        {/* SPACE + WORLD */}
-        <span style={{ marginLeft: "20px" }}>WORLD</span>
+        <span
+          style={{
+            marginLeft: "24px",
+            paddingBottom: "6px",
+          }}
+        >
+          WORLD
+        </span>
       </div>
     </div>
   );
 }
+
