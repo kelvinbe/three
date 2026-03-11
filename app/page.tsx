@@ -1,7 +1,9 @@
 'use client'
+import Menu from "@/components/Menu";
 import World from "@/lib/webgl/world";
 
 export default function Home() {
+
   const hello = [
     { char: "H", mirrored: false },
     { char: "E", mirrored: true },
@@ -9,8 +11,6 @@ export default function Home() {
     { char: "L", mirrored: true },
     { char: "O", mirrored: false },
   ];
-
-  const menu = ["HOME", "ABOUT", "WORKS", "ARTWORK"];
 
   const neonStyle = {
     color: "#e6ffff",
@@ -27,9 +27,11 @@ export default function Home() {
 
   return (
     <div className="container">
+
       <style jsx global>{`
         body {
           margin: 0;
+          overflow-x: hidden;
         }
 
         @keyframes brokenFlicker {
@@ -56,30 +58,11 @@ export default function Home() {
           position: relative;
           width: 100vw;
           height: 100vh;
-          overflow: hidden;
+          min-height: 600px;
           font-family: Arial, Helvetica, sans-serif;
         }
 
-        .menu {
-          position: absolute;
-          top: 20%;
-          left: 90px;
-          transform: translateY(-50%);
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          gap: 28px;
-          color: #cfcfcf;
-        }
-
-        .menuItem {
-          font-size: 14px;
-          letter-spacing: 3px;
-          border-bottom: 1px solid rgba(255,255,255,0.35);
-          padding-bottom: 6px;
-          cursor: pointer;
-          transition: all 0.3s ease;
-        }
+        /* CENTER HELLO TEXT */
 
         .centerText {
           position: absolute;
@@ -89,63 +72,84 @@ export default function Home() {
           display: flex;
           align-items: center;
           gap: 14px;
-          font-size: 4vw;
-          letter-spacing: 2vw;
+          font-size: clamp(48px, 4vw, 90px);
+          letter-spacing: clamp(10px, 2vw, 40px);
+          text-align: center;
         }
 
         .subText {
           position: absolute;
-          top: 58%;
+          top: 60%;
           left: 50%;
-          transform: translate(-50%, -0%);
+          transform: translate(-50%, 0%);
           display: flex;
           flex-direction: column;
           align-items: center;
           gap: 10px;
-          font-size: 1.5vw;
-          letter-spacing: 0.8vw;
+          font-size: 14px;
+          letter-spacing: 0.5em;
+          text-align: center;
         }
 
-        /* MOBILE */
-        @media (max-width: 768px) {
+        /* TABLET */
 
-          .menu {
-            top: 30px;
-            left: 50%;
-            transform: translateX(-50%);
-            flex-direction: row;
-            gap: 20px;
-          }
-
-          .menuItem {
-            font-size: 12px;
-            letter-spacing: 2px;
-          }
+        @media (max-width: 1024px) {
 
           .centerText {
-            font-size: 10vw;
-            letter-spacing: 4vw;
+            font-size: clamp(40px, 6vw, 70px);
+            letter-spacing: clamp(8px, 3vw, 28px);
           }
 
           .subText {
-            font-size: 4vw;
-            letter-spacing: 2vw;
             top: 62%;
+            font-size: 13px;
           }
+
         }
+
+        /* MOBILE */
+
+        @media (max-width: 768px) {
+
+          .centerText {
+            flex-wrap: wrap;
+            justify-content: center;
+            font-size: clamp(36px, 10vw, 60px);
+            letter-spacing: clamp(6px, 4vw, 20px);
+            gap: 10px;
+          }
+
+          .subText {
+            top: 65%;
+            font-size: 12px;
+            letter-spacing: 0.3em;
+          }
+
+        }
+
+        /* SMALL PHONES */
+
+        @media (max-width: 480px) {
+
+          .centerText {
+            font-size: clamp(28px, 12vw, 48px);
+            letter-spacing: clamp(4px, 5vw, 16px);
+          }
+
+          .subText {
+            top: 67%;
+            font-size: 11px;
+          }
+
+        }
+
       `}</style>
 
-      {/* WebGL background */}
+      {/* WebGL Background */}
       <World img="/main.jpg" />
 
       {/* Menu */}
-      <div className="menu">
-        {menu.map((item) => (
-          <div key={item} className="menuItem">
-            {item}
-          </div>
-        ))}
-      </div>
+      <Menu />
 
       {/* HELLO WORLD */}
       <div className="centerText">
@@ -167,16 +171,12 @@ export default function Home() {
         </span>
       </div>
 
-      {/* Name + Japanese */}
+      {/* SUBTEXT */}
       <div className="subText">
         <div>KELVIN BENO</div>
-
-        <span>
-          デベロッパー
-        </span>
+        <span>デベロッパー</span>
       </div>
 
     </div>
   );
 }
-
