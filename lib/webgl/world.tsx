@@ -54,7 +54,7 @@ export default function World({ img }: WorldProps) {
     `;
 
     const textureLoader = new THREE.TextureLoader();
-    textureLoader.load(img, (texture) => {
+    textureLoader.load(img, (texture: any) => {
       const uniforms = {
         uTexture: { value: texture },
         uTime: { value: 0 },
