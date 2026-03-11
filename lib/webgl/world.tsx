@@ -3,16 +3,11 @@
 import { useEffect, useRef } from "react";
 import * as THREE from "three";
 
-interface Item {
-  name: string;
+interface WorldProps {
   img: string;
 }
 
-interface WorldProps {
-  items: Item[];
-}
-
-export default function World({ items }: WorldProps) {
+export default function World({ img }: WorldProps) {
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -20,10 +15,11 @@ export default function World({ items }: WorldProps) {
 
     const width = ref.current.clientWidth;
     const height = ref.current.clientHeight;
+    const screenAspect = width / height;
 
     const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 100);
-    camera.position.z = 5;
+    const camera = new THREE.PerspectiveCamera(45, screenAspect, 0.1, 10);
+    camera.position.z = 1.5;
 
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
     renderer.setSize(width, height);
@@ -32,10 +28,7 @@ export default function World({ items }: WorldProps) {
 
     const raycaster = new THREE.Raycaster();
     const mouse = new THREE.Vector2();
-    const planes: THREE.Mesh[] = [];
-    const textureLoader = new THREE.TextureLoader();
 
-    // Vertex & Fragment shaders
     const vertexShader = `
       varying vec2 vUv;
       uniform float uTime;
@@ -60,91 +53,93 @@ export default function World({ items }: WorldProps) {
       }
     `;
 
-    // Load all items as planes
-    items.forEach((item, i) => {
-      const texturePath = `/assets/item/${item.img}.webp`; // Correct path
-      textureLoader.load(
-        texturePath,
-        (texture) => {
-          const uniforms = {
-            uTexture: { value: texture },
-            uTime: { value: 0 },
-            uClick: { value: new THREE.Vector2(0.5, 0.5) },
-            uProgress: { value: 0 },
-          };
+    const textureLoader = new THREE.TextureLoader();
+    textureLoader.load(img, (texture) => {
+      const uniforms = {
+        uTexture: { value: texture },
+        uTime: { value: 0 },
+        uClick: { value: new THREE.Vector2(0.5, 0.5) },
+        uProgress: { value: 0 },
+      };
 
-          const material = new THREE.ShaderMaterial({
-            uniforms,
-            vertexShader,
-            fragmentShader,
-          });
+      const material = new THREE.ShaderMaterial({
+        uniforms,
+        vertexShader,
+        fragmentShader,
+      });
 
-          const geometry = new THREE.PlaneGeometry(1.6, 1, 64, 64);
-          const mesh = new THREE.Mesh(geometry, material);
+      // Calculate plane size to cover screen while preserving image aspect
+      const imgAspect = texture.image.width / texture.image.height;
+      let planeWidth = 2;
+      let planeHeight = 2;
 
-          // Center planes horizontally
-          mesh.position.x = i * 2 - ((items.length - 1) * 1);
-          mesh.userData = { uniforms };
+      if (screenAspect > imgAspect) {
+        // screen is wider → scale height
+        planeHeight = 2;
+        planeWidth = planeHeight * screenAspect / imgAspect;
+      } else {
+        // screen is taller → scale width
+        planeWidth = 2;
+        planeHeight = planeWidth * imgAspect / screenAspect;
+      }
 
-          scene.add(mesh);
-          planes.push(mesh);
-        },
-        undefined,
-        (err) => console.error("Failed to load texture:", texturePath, err)
-      );
-    });
+      const geometry = new THREE.PlaneGeometry(planeWidth, planeHeight, 64, 64);
+      const plane = new THREE.Mesh(geometry, material);
+      plane.userData = { uniforms };
+      scene.add(plane);
 
-    // Click ripple
-    const handleClick = (event: MouseEvent) => {
-      const rect = renderer.domElement.getBoundingClientRect();
-      mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
-      mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+      const handleClick = (event: MouseEvent) => {
+        const rect = renderer.domElement.getBoundingClientRect();
+        mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+        mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
 
-      raycaster.setFromCamera(mouse, camera);
-      const intersects = raycaster.intersectObjects(planes);
-
-      intersects.forEach((intersect) => {
-        const uniforms = (intersect.object as any).userData.uniforms;
-        if (uniforms) {
-          const uv = intersect.uv!;
+        raycaster.setFromCamera(mouse, camera);
+        const intersects = raycaster.intersectObject(plane);
+        if (intersects.length > 0) {
+          const uv = intersects[0].uv!;
           uniforms.uClick.value = uv;
           uniforms.uProgress.value = 1;
         }
-      });
-    };
+      };
 
-    renderer.domElement.addEventListener("click", handleClick);
+      renderer.domElement.addEventListener("click", handleClick);
 
-    // Animate
-    const animate = () => {
-      requestAnimationFrame(animate);
-      planes.forEach((mesh) => {
-        const uniforms = (mesh as any).userData.uniforms;
-        if (uniforms) {
-          uniforms.uTime.value += 0.05;
-          uniforms.uProgress.value *= 0.95;
+      const animate = () => {
+        requestAnimationFrame(animate);
+        uniforms.uTime.value += 0.05;
+        uniforms.uProgress.value *= 0.95;
+        renderer.render(scene, camera);
+      };
+      animate();
+
+      const handleResize = () => {
+        const w = ref.current!.clientWidth;
+        const h = ref.current!.clientHeight;
+        const screenAspect = w / h;
+        camera.aspect = screenAspect;
+        camera.updateProjectionMatrix();
+
+        // Adjust plane to new aspect
+        if (screenAspect > imgAspect) {
+          planeHeight = 2;
+          planeWidth = planeHeight * screenAspect / imgAspect;
+        } else {
+          planeWidth = 2;
+          planeHeight = planeWidth * imgAspect / screenAspect;
         }
-      });
-      renderer.render(scene, camera);
-    };
-    animate();
+        plane.scale.set(planeWidth / 2, planeHeight / 2, 1); // scale relative to initial geometry
 
-    // Resize handler
-    const handleResize = () => {
-      const w = ref.current!.clientWidth;
-      const h = ref.current!.clientHeight;
-      camera.aspect = w / h;
-      camera.updateProjectionMatrix();
-      renderer.setSize(w, h);
-    };
-    window.addEventListener("resize", handleResize);
+        renderer.setSize(w, h);
+      };
+      window.addEventListener("resize", handleResize);
 
-    return () => {
-      renderer.domElement.removeEventListener("click", handleClick);
-      window.removeEventListener("resize", handleResize);
-      renderer.dispose();
-    };
-  }, [items]);
+      return () => {
+        renderer.domElement.removeEventListener("click", handleClick);
+        window.removeEventListener("resize", handleResize);
+        renderer.dispose();
+      };
+    });
+  }, [img]);
 
   return (
     <div
