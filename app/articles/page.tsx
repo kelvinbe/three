@@ -25,7 +25,7 @@ export default function Works() {
       link: "https://kevdev.hashnode.dev/exploring-your-network-with-virtual-machines-and-nmap"
     },
     {
-      title: "How Django and Node.js Can Work Together to Build Scalable AI Applications",
+      title: "How Django and Node.js Can Work Together to Build Scalable AI",
       image: "/brain.webp",
       link: "https://kevdev.hashnode.dev/how-django-and-nodejs-can-work-together-to-build-scalable-ai-applications"
     },
