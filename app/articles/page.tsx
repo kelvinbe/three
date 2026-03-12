@@ -20,24 +20,24 @@ export default function Works() {
 
   const works = [
     {
-      title: "Interactive Museum",
-      image: "/works/project-a.jpg",
-      link: "/works/project-a"
+      title: "Exploring Your Network with Virtual Machines and Nmap",
+      image: "/nmap.webp",
+      link: "https://kevdev.hashnode.dev/exploring-your-network-with-virtual-machines-and-nmap"
     },
     {
-      title: "Creative Portfolio",
-      image: "/works/project-b.jpg",
-      link: "/works/project-b"
+      title: "How Django and Node.js Can Work Together to Build Scalable AI Applications",
+      image: "/brain.webp",
+      link: "https://kevdev.hashnode.dev/how-django-and-nodejs-can-work-together-to-build-scalable-ai-applications"
     },
     {
-      title: "WebGL Experiments",
-      image: "/works/project-c.jpg",
-      link: "/works/project-c"
+      title: "What the Heck is an Event Emitter in Node.js?",
+      image: "/event.webp",
+      link: "https://kevdev.hashnode.dev/what-the-heck-is-an-event-emitter-in-nodejs"
     },
     {
-      title: "Digital Campaign",
-      image: "/works/project-d.jpg",
-      link: "/works/project-d"
+      title: "🚀 A Quick Introduction to Kubernetes",
+      image: "/kube.webp",
+      link: "https://kevdev.hashnode.dev/a-quick-introduction-to-kubernetes"
     }
   ];
 
