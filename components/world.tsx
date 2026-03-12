@@ -1,116 +1,145 @@
-"use client";
+'use client'
 
-import { useEffect, useRef } from "react";
+import { gsap } from "gsap";
+import { useRef, useEffect } from "react";
 import * as THREE from "three";
 
+/* GLOBAL reference so other files can access it */
+let distortionMaterial: THREE.ShaderMaterial | null = null;
+
+export function triggerDistortion() {
+  if (!distortionMaterial) return;
+
+  gsap.fromTo(
+    distortionMaterial.uniforms.uDistortion,
+    { value: 0 },
+    {
+      value: 1,
+      duration: 0.25,
+      yoyo: true,
+      repeat: 1,
+      ease: "power2.inOut"
+    }
+  );
+}
+
 export default function World() {
-  const ref = useRef<HTMLDivElement>(null);
+
+  const mountRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (!ref.current) return;
 
-    const width = ref.current.clientWidth;
-    const height = ref.current.clientHeight;
+    const mount = mountRef.current;
+    if (!mount) return;
 
     const scene = new THREE.Scene();
 
-    const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 100);
-    camera.position.z = 2;
+    const camera = new THREE.OrthographicCamera(
+      -1, 1, 1, -1, 0.1, 10
+    );
+
+    camera.position.z = 1;
 
     const renderer = new THREE.WebGLRenderer({ antialias: true });
-    renderer.setSize(width, height);
-    ref.current.appendChild(renderer.domElement);
 
-    const textureLoader = new THREE.TextureLoader();
+    renderer.setSize(window.innerWidth, window.innerHeight);
 
-    textureLoader.load("/image.jpg", (texture) => {
-      const uniforms = {
-        uTexture: { value: texture },
+    mount.appendChild(renderer.domElement);
+
+    const texture = new THREE.TextureLoader().load("/background.jpg");
+
+    const material = new THREE.ShaderMaterial({
+
+      uniforms: {
         uTime: { value: 0 },
-        uClick: { value: new THREE.Vector2(0.5, 0.5) },
-        uProgress: { value: 0 }
-      };
+        uTexture: { value: texture },
+        uDistortion: { value: 0 }
+      },
 
-      const geometry = new THREE.PlaneGeometry(1.6, 1, 64, 64);
-
-      const material = new THREE.ShaderMaterial({
-        uniforms,
-
-        vertexShader: `
+      vertexShader: `
         varying vec2 vUv;
-        uniform float uTime;
-        uniform vec2 uClick;
-        uniform float uProgress;
-
         void main() {
           vUv = uv;
-
-          vec3 pos = position;
-
-          float dist = distance(uv, uClick);
-
-          pos.z += sin(dist * 20.0 - uTime * 4.0) * 0.2 * uProgress;
-
-          gl_Position = projectionMatrix * modelViewMatrix * vec4(pos,1.0);
+          gl_Position = vec4(position,1.0);
         }
-        `,
+      `,
 
-        fragmentShader: `
+      fragmentShader: `
         uniform sampler2D uTexture;
+        uniform float uTime;
+        uniform float uDistortion;
+
         varying vec2 vUv;
 
-        void main() {
-          gl_FragColor = texture2D(uTexture, vUv);
+        float random(vec2 st){
+          return fract(sin(dot(st.xy,vec2(12.9898,78.233))) * 43758.5453123);
         }
-        `
-      });
 
-      const mesh = new THREE.Mesh(geometry, material);
-      scene.add(mesh);
+        void main(){
 
-      const raycaster = new THREE.Raycaster();
-      const mouse = new THREE.Vector2();
+          vec2 uv = vUv;
 
-      const handleClick = (event: MouseEvent) => {
-        const rect = renderer.domElement.getBoundingClientRect();
+          uv.y += sin(uv.x * 10.0 + uTime) * 0.02 * uDistortion;
 
-        mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
-        mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+          vec4 color = texture2D(uTexture, uv);
 
-        raycaster.setFromCamera(mouse, camera);
+          float noise = random(gl_FragCoord.xy + uTime) * 0.05 * uDistortion;
 
-        const intersects = raycaster.intersectObject(mesh);
+          color.rgb += noise;
 
-        if (intersects.length > 0) {
-          const uv = intersects[0].uv!;
-          uniforms.uClick.value = uv;
-          uniforms.uProgress.value = 1;
+          gl_FragColor = color;
         }
-      };
-
-      renderer.domElement.addEventListener("click", handleClick);
-
-      const animate = () => {
-        requestAnimationFrame(animate);
-
-        uniforms.uTime.value += 0.05;
-        uniforms.uProgress.value *= 0.95;
-
-        renderer.render(scene, camera);
-      };
-
-      animate();
+      `
     });
+
+    /* Save material globally */
+    distortionMaterial = material;
+
+    const plane = new THREE.Mesh(
+      new THREE.PlaneGeometry(2,2),
+      material
+    );
+
+    scene.add(plane);
+
+    const clock = new THREE.Clock();
+
+    const animate = () => {
+
+      material.uniforms.uTime.value = clock.getElapsedTime();
+
+      renderer.render(scene, camera);
+
+      requestAnimationFrame(animate);
+    };
+
+    animate();
+
+    const handleResize = () => {
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    };
+
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+
+      mount.removeChild(renderer.domElement);
+
+      window.removeEventListener("resize", handleResize);
+    };
 
   }, []);
 
   return (
     <div
-      ref={ref}
+      ref={mountRef}
       style={{
-        width: "100vw",
-        height: "100vh",
-        overflow: "hidden"
+        position: "fixed",
+        top:0,
+        left:0,
+        width:"100%",
+        height:"100%",
+        zIndex:-1
       }}
     />
   );

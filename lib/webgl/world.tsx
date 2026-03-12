@@ -1,155 +1,137 @@
-"use client";
+'use client'
 
-import { useEffect, useRef } from "react";
-import * as THREE from "three";
+import { useEffect, useRef } from "react"
+import * as THREE from "three"
+import { gsap } from "gsap"
 
-interface WorldProps {
-  img: string;
+let materialRef: THREE.ShaderMaterial | null = null
+
+export function triggerDistortion() {
+
+  if(!materialRef) return
+
+  gsap.timeline()
+    .to(materialRef.uniforms.uDistortion,{value:1,duration:.35,ease:"power2.out"})
+    .to(materialRef.uniforms.uBlur,{value:1,duration:.25},0)
 }
 
-export default function World({ img }: WorldProps) {
-  const ref = useRef<HTMLDivElement>(null);
+export function resetDistortion(){
 
-  useEffect(() => {
-    if (!ref.current) return;
+  if(!materialRef) return
 
-    const width = ref.current.clientWidth;
-    const height = ref.current.clientHeight;
-    const screenAspect = width / height;
+  gsap.to(materialRef.uniforms.uDistortion,{value:0,duration:.6,ease:"power3.out"})
+  gsap.to(materialRef.uniforms.uBlur,{value:0,duration:.6,ease:"power3.out"})
+}
 
-    const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(45, screenAspect, 0.1, 10);
-    camera.position.z = 1.5;
+export default function World({img}:{img:string}){
 
-    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-    renderer.setSize(width, height);
-    renderer.setPixelRatio(window.devicePixelRatio);
-    ref.current.appendChild(renderer.domElement);
+  const ref = useRef<HTMLDivElement>(null)
 
-    const raycaster = new THREE.Raycaster();
-    const mouse = new THREE.Vector2();
+  useEffect(()=>{
 
-    const vertexShader = `
-      varying vec2 vUv;
-      uniform float uTime;
-      uniform vec2 uClick;
-      uniform float uProgress;
+    const scene = new THREE.Scene()
 
-      void main() {
-        vUv = uv;
-        vec3 pos = position;
-        float dist = distance(uv, uClick);
-        pos.z += sin(dist * 20.0 - uTime * 4.0) * 0.2 * uProgress;
-        gl_Position = projectionMatrix * modelViewMatrix * vec4(pos,1.0);
-      }
-    `;
+    const camera = new THREE.OrthographicCamera(-1,1,1,-1,0,10)
+    camera.position.z = 1
 
-    const fragmentShader = `
-      uniform sampler2D uTexture;
-      varying vec2 vUv;
+    const renderer = new THREE.WebGLRenderer({antialias:true})
+    renderer.setSize(window.innerWidth,window.innerHeight)
 
-      void main() {
-        gl_FragColor = texture2D(uTexture, vUv);
-      }
-    `;
+    ref.current?.appendChild(renderer.domElement)
 
-    const textureLoader = new THREE.TextureLoader();
-    textureLoader.load(img, (texture: any) => {
+    const loader = new THREE.TextureLoader()
+
+    loader.load(img,(texture)=>{
+
       const uniforms = {
-        uTexture: { value: texture },
-        uTime: { value: 0 },
-        uClick: { value: new THREE.Vector2(0.5, 0.5) },
-        uProgress: { value: 0 },
-      };
+        uTexture:{value:texture},
+        uTime:{value:0},
+        uDistortion:{value:0},
+        uBlur:{value:0}
+      }
 
       const material = new THREE.ShaderMaterial({
+
         uniforms,
-        vertexShader,
-        fragmentShader,
-      });
 
-      // Calculate plane size to cover screen while preserving image aspect
-      const imgAspect = texture.image.width / texture.image.height;
-      let planeWidth = 2;
-      let planeHeight = 2;
+        vertexShader:`
+        varying vec2 vUv;
 
-      if (screenAspect > imgAspect) {
-        // screen is wider → scale height
-        planeHeight = 2;
-        planeWidth = planeHeight * screenAspect / imgAspect;
-      } else {
-        // screen is taller → scale width
-        planeWidth = 2;
-        planeHeight = planeWidth * imgAspect / screenAspect;
+        void main(){
+          vUv = uv;
+          gl_Position = vec4(position,1.0);
+        }
+        `,
+
+        fragmentShader:`
+
+        uniform sampler2D uTexture;
+        uniform float uTime;
+        uniform float uDistortion;
+        uniform float uBlur;
+
+        varying vec2 vUv;
+
+        float rand(vec2 co){
+          return fract(sin(dot(co.xy,vec2(12.9898,78.233))) * 43758.5453);
+        }
+
+        void main(){
+
+          vec2 uv = vUv;
+
+          float band = step(.75,rand(vec2(uv.y*20.,uTime)));
+
+          uv.x += band*.2*uDistortion;
+
+          uv.x += sin(uv.y*40.+uTime*5.)*.015*uDistortion;
+
+          vec4 color = texture2D(uTexture,uv);
+
+          float shift = .02*uDistortion;
+
+          color.r = texture2D(uTexture,uv+vec2(shift,0)).r;
+          color.b = texture2D(uTexture,uv-vec2(shift,0)).b;
+
+          color.rgb = mix(color.rgb,vec3(dot(color.rgb,vec3(.33))),uBlur*.3);
+
+          gl_FragColor = color;
+        }
+        `
+      })
+
+      materialRef = material
+
+      const geometry = new THREE.PlaneGeometry(2,2)
+      const mesh = new THREE.Mesh(geometry,material)
+
+      scene.add(mesh)
+
+      const clock = new THREE.Clock()
+
+      const animate = ()=>{
+
+        uniforms.uTime.value = clock.getElapsedTime()
+
+        renderer.render(scene,camera)
+
+        requestAnimationFrame(animate)
       }
 
-      const geometry = new THREE.PlaneGeometry(planeWidth, planeHeight, 64, 64);
-      const plane = new THREE.Mesh(geometry, material);
-      plane.userData = { uniforms };
-      scene.add(plane);
+      animate()
 
-      const handleClick = (event: MouseEvent) => {
-        const rect = renderer.domElement.getBoundingClientRect();
-        mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
-        mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+    })
 
-        raycaster.setFromCamera(mouse, camera);
-        const intersects = raycaster.intersectObject(plane);
-        if (intersects.length > 0) {
-          const uv = intersects[0].uv!;
-          uniforms.uClick.value = uv;
-          uniforms.uProgress.value = 1;
-        }
-      };
+  },[])
 
-      renderer.domElement.addEventListener("click", handleClick);
-
-      const animate = () => {
-        requestAnimationFrame(animate);
-        uniforms.uTime.value += 0.05;
-        uniforms.uProgress.value *= 0.95;
-        renderer.render(scene, camera);
-      };
-      animate();
-
-      const handleResize = () => {
-        const w = ref.current!.clientWidth;
-        const h = ref.current!.clientHeight;
-        const screenAspect = w / h;
-        camera.aspect = screenAspect;
-        camera.updateProjectionMatrix();
-
-        // Adjust plane to new aspect
-        if (screenAspect > imgAspect) {
-          planeHeight = 2;
-          planeWidth = planeHeight * screenAspect / imgAspect;
-        } else {
-          planeWidth = 2;
-          planeHeight = planeWidth * imgAspect / screenAspect;
-        }
-        plane.scale.set(planeWidth / 2, planeHeight / 2, 1); // scale relative to initial geometry
-
-        renderer.setSize(w, h);
-      };
-      window.addEventListener("resize", handleResize);
-
-      return () => {
-        renderer.domElement.removeEventListener("click", handleClick);
-        window.removeEventListener("resize", handleResize);
-        renderer.dispose();
-      };
-    });
-  }, [img]);
-
-  return (
+  return(
     <div
       ref={ref}
       style={{
-        width: "100vw",
-        height: "100vh",
-        overflow: "hidden",
-        position: "relative",
+        position:"fixed",
+        inset:0,
+        zIndex:-1
       }}
     />
-  );
+  )
 }

@@ -146,7 +146,6 @@ export default function Home() {
       `}</style>
 
       {/* WebGL Background */}
-      <World img="/main.jpg" />
 
       {/* Menu */}
       <Menu />

@@ -1,9 +1,43 @@
 'use client'
-import Link from "next/link";
+
+import { triggerDistortion, resetDistortion } from "../lib/webgl/world";
+import { useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
+import { useEffect } from "react";
 
 export default function Menu() {
 
-  const menu = ["HOME", "ABOUT", "WORKS", "ARTWORK"];
+  const router = useRouter();
+
+  const menu = ["HOME", "ABOUT", "WORKS", "ARTICLES"];
+
+  const getHref = (item:string) => {
+    if(item === "HOME") return "/";
+    if(item === "ABOUT") return "/about";
+    if(item === "WORKS") return "/work";
+    if(item === "ARTICLES") return "/articles";
+  };
+
+  const pathname = usePathname();
+
+useEffect(() => {
+  resetDistortion();
+}, [pathname]);
+
+const handleClick = (href:string) => {
+
+  triggerDistortion();
+
+  setTimeout(()=>{
+    router.push(href);
+  },350);
+
+  // reset AFTER page loads
+  setTimeout(()=>{
+    resetDistortion();
+  },700);
+
+};
 
   return (
     <div className="menu">
@@ -52,23 +86,21 @@ export default function Menu() {
         }
       `}</style>
 
-      {menu.map((item) => (
-        <Link
-          key={item}
-          href={
-            item === "HOME"
-              ? "/"
-              : item === "ABOUT"
-              ? "/about"
-              : item === "WORKS"
-              ? "/work"
-              : "/artwork"
-          }
-          style={{ textDecoration: "none", color: "inherit" }}
-        >
-          <div className="menuItem">{item}</div>
-        </Link>
-      ))}
+      {menu.map((item) => {
+
+        const href = getHref(item);
+
+        return (
+          <div
+            key={item}
+            className="menuItem"
+            onClick={() => handleClick(href)}
+          >
+            {item}
+          </div>
+        )
+
+      })}
 
     </div>
   );
