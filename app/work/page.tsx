@@ -5,6 +5,7 @@ import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Menu from "@/components/Menu";
 import Link from "next/link";
+import { view } from "framer-motion/client";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -24,21 +25,24 @@ export default function Works() {
       year: "2024",
       role: "Software Developer",
       image: "/kaya.png",
-      link: "https://terminalms.netlify.app/"
+      link: "https://terminalms.netlify.app/",
+      view: "Desktop View Only"
     },
     {
       title: "CARD MANAGEMENT SYSTEM",
       year: "2025",
       role: "Software Developer",
       image: "/card.png",
-      link: "https://cmssnairobi.netlify.app/"
+      link: "https://cmssnairobi.netlify.app/",
+      view: "Desktop View Only"
     },
     {
       title: "MEMO SOME",
       year: "2026",
-      role: "Creative Development",
+      role: "Software Developer",
       image: "/memo.png",
-      link: "https://www.memosome.com/"
+      link: "https://www.memosome.com/",
+      view: "Desktop and Mobile View Only"
     }
   ];
 
@@ -75,7 +79,7 @@ export default function Works() {
 
       <Menu />
 
-        <h1
+      <h1
         style={{
           fontSize: "32px",
           fontWeight: "300",
@@ -93,17 +97,20 @@ export default function Works() {
 
           <Link key={i} href={work.link} className="workLink">
 
-            <div ref={addToRefs} className="workCard">
+            <div ref={addToRefs} className="workItem">
 
-              <img src={work.image} className="workImage" />
+              <div className="workCard">
+                <img src={work.image} className="workImage" />
+              </div>
 
-              <div className="overlay">
+              <div className="workInfo">
 
                 <h2>{work.title}</h2>
 
                 <div className="meta">
                   <span>{work.year}</span>
                   <span>{work.role}</span>
+                  <span>{work.view}</span>
                 </div>
 
               </div>
@@ -136,6 +143,13 @@ export default function Works() {
 
         .workLink{
           text-decoration:none;
+          color:white;
+        }
+
+        .workItem{
+          display:flex;
+          flex-direction:column;
+          gap:20px;
         }
 
         .workCard{
@@ -144,7 +158,6 @@ export default function Works() {
           border-radius:20px;
           overflow:hidden;
           cursor:pointer;
-          color:white;
           background:#000;
 
           transition:transform .6s ease;
@@ -160,39 +173,32 @@ export default function Works() {
         }
 
         .workImage{
-          position:absolute;
           width:100%;
           height:100%;
           object-fit:cover;
-          filter:brightness(.7) blur(.2px);
+          filter:brightness(.85);
         }
 
-        .overlay{
-          position:absolute;
-          inset:0;
-          display:flex;
-          flex-direction:column;
-          justify-content:center;
-          align-items:center;
+        .workInfo{
           text-align:center;
+          color: white;
+          text-decoration:underline;
         }
 
-        .overlay h2{
-          font-size:42px;
-          letter-spacing:.25em;
+        .workInfo h2{
+          font-size:32px;
+          letter-spacing:.2em;
           font-weight:300;
-          margin-bottom:20px;
-          text-shadow:0 0 20px rgba(255,255,255,.5);
         }
 
         .meta{
           display:flex;
-          flex-direction:column;
-          gap:6px;
-          font-size:13px;
+          justify-content:center;
+          gap:20px;
+          font-size:12px;
           letter-spacing:.2em;
           opacity:.8;
-          color: white;
+          text-decoration:underline;
         }
 
         /* MOBILE */
@@ -207,8 +213,8 @@ export default function Works() {
             height:320px;
           }
 
-          .overlay h2{
-            font-size:28px;
+          .workInfo h2{
+            font-size:22px;
           }
 
         }

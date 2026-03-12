@@ -65,9 +65,9 @@ I combine motion, design and code to create digital stories.`
       number: "04",
       title: "LINKS",
       paragraphs: [
-`I design and develop interactive web experiences.
-My focus is WebGL, Three.js and immersive interfaces.
-My aim is to combine motion, design, and code to create digital stories.`
+`Portfolio: https://yourportfolio.com
+GitHub: https://github.com/yourname
+LinkedIn: https://linkedin.com/in/yourname`
       ]
     }
   ]
@@ -105,13 +105,9 @@ My aim is to combine motion, design, and code to create digital stories.`
 
         <div key={sectionIndex} className="aboutSection">
 
-          {/* LEFT LABEL */}
-
           <h2 className="aboutLabel">
             [ {section.number} {section.title} ]
           </h2>
-
-          {/* RIGHT TEXT */}
 
           <div className="aboutText">
 
@@ -139,6 +135,7 @@ My aim is to combine motion, design, and code to create digital stories.`
           color:white;
           position:relative;
           padding:0 24px;
+          padding-bottom:200px; /* SPACE AFTER LAST SECTION */
         }
 
         .aboutSection{
@@ -148,6 +145,10 @@ My aim is to combine motion, design, and code to create digital stories.`
           margin:0 auto;
           padding-top:120px;
           align-items:flex-start;
+        }
+
+        .aboutSection:last-child{
+          padding-bottom:120px; /* extra breathing room */
         }
 
         .aboutLabel{
@@ -170,6 +171,10 @@ My aim is to combine motion, design, and code to create digital stories.`
 
         .aboutText p{
           margin-bottom:80px;
+        }
+
+        .aboutText p:last-child{
+          margin-bottom:0;
         }
 
         /* TABLET */
