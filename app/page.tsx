@@ -112,7 +112,7 @@ export default function Home() {
         @media (max-width: 768px) {
 
           .centerText {
-            flex-wrap: wrap;
+            flex-wrap: nowrap;
             justify-content: center;
             font-size: clamp(36px, 10vw, 60px);
             letter-spacing: clamp(6px, 4vw, 20px);
@@ -132,7 +132,7 @@ export default function Home() {
         @media (max-width: 480px) {
 
           .centerText {
-            font-size: clamp(28px, 12vw, 48px);
+            font-size: clamp(18px, 10vw, 18px);
             letter-spacing: clamp(4px, 5vw, 16px);
           }
 
