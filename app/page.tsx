@@ -73,8 +73,9 @@ export default function Home() {
           align-items: center;
           gap: 14px;
           font-size: clamp(48px, 4vw, 90px);
-          letter-spacing: clamp(10px, 2vw, 40px);
+          letter-spacing: clamp(9px, 2vw, 30px);
           text-align: center;
+
         }
 
         .subText {
