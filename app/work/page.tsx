@@ -20,25 +20,25 @@ export default function Works() {
 
   const works = [
     {
-      title: "ECORU TOGOSHI",
-      year: "2022",
-      role: "Interactive Developer",
-      image: "/works/project-a.jpg",
-      link: "/works/project-a"
-    },
-    {
-      title: "DIGITAL MUSEUM",
-      year: "2023",
-      role: "WebGL Experience",
-      image: "/works/project-b.jpg",
-      link: "/works/project-b"
-    },
-    {
-      title: "NEON CITY",
+      title: "TERMINAL MANAGEMENT SYSTEM",
       year: "2024",
+      role: "Software Developer",
+      image: "/kaya.png",
+      link: "https://terminalms.netlify.app/"
+    },
+    {
+      title: "CARD MANAGEMENT SYSTEM",
+      year: "2025",
+      role: "Software Developer",
+      image: "/card.png",
+      link: "https://cmssnairobi.netlify.app/"
+    },
+    {
+      title: "MEMO SOME",
+      year: "2026",
       role: "Creative Development",
-      image: "/works/project-c.jpg",
-      link: "/works/project-c"
+      image: "/memo.png",
+      link: "https://www.memosome.com/"
     }
   ];
 
@@ -144,7 +144,7 @@ export default function Works() {
           border-radius:20px;
           overflow:hidden;
           cursor:pointer;
-
+          color:white;
           background:#000;
 
           transition:transform .6s ease;
@@ -192,6 +192,7 @@ export default function Works() {
           font-size:13px;
           letter-spacing:.2em;
           opacity:.8;
+          color: white;
         }
 
         /* MOBILE */

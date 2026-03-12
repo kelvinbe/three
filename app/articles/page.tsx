@@ -8,7 +8,8 @@ import Link from "next/link";
 
 gsap.registerPlugin(ScrollTrigger);
 
-export default function Articles() {
+export default function Works() {
+
   const refs = useRef<HTMLDivElement[]>([]);
 
   const addToRefs = (el: HTMLDivElement) => {
@@ -19,131 +20,186 @@ export default function Articles() {
 
   const works = [
     {
-      title: "Project A",
-      description: "Corporate website built with Next.js and Tailwind CSS.",
+      title: "Interactive Museum",
       image: "/works/project-a.jpg",
       link: "/works/project-a"
     },
     {
-      title: "Project B",
-      description: "Interactive WebGL portfolio showcasing 3D models.",
+      title: "Creative Portfolio",
       image: "/works/project-b.jpg",
       link: "/works/project-b"
     },
     {
-      title: "Project C",
-      description: "Campaign landing page with animations and GSAP scroll effects.",
+      title: "WebGL Experiments",
       image: "/works/project-c.jpg",
       link: "/works/project-c"
     },
     {
-      title: "Project D",
-      description: "Custom WordPress theme with dynamic content management.",
+      title: "Digital Campaign",
       image: "/works/project-d.jpg",
       link: "/works/project-d"
     }
   ];
 
   useEffect(() => {
+
     refs.current.forEach((el) => {
+
       gsap.fromTo(
         el,
-        { opacity: 0, y: 80 },
+        { opacity: 0, y: 80, rotate: -3 },
         {
           opacity: 1,
           y: 0,
-          duration: 1.2,
+          rotate: 0,
+          duration: 1,
           ease: "power3.out",
           scrollTrigger: {
             trigger: el,
-            start: "top 80%"
+            start: "top 85%"
           }
         }
       );
+
     });
+
   }, []);
 
   return (
-    <div
-      style={{
-        minHeight: "200vh",
-        color: "white",
-        position: "relative",
-        padding: "0 20px"
-      }}
-    >
+
+    <div className="container">
+
       <Menu />
 
-      <h1
-        style={{
-          fontSize: "32px",
-          fontWeight: "300",
-          margin: "60px auto",
-          maxWidth: "1100px",
-          textAlign: "center"
-        }}
-      >
-        My Works
-      </h1>
+      <div className="row">
 
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          gap: "60px",
-          maxWidth: "800px",
-          margin: "0 auto",
-          paddingBottom: "100px"
-        }}
-      >
         {works.map((work, i) => (
-          <Link
-            key={i}
-            href={work.link}
-            style={{
-              textDecoration: "none",
-              color: "inherit"
-            }}
-          >
-            <div
-              ref={addToRefs}
-              style={{
-                display: "flex",
-                gap: "20px",
-                background: "#111",
-                borderRadius: "12px",
-                overflow: "hidden",
-                cursor: "pointer",
-                flexDirection: "row",
-                alignItems: "flex-start",
-                transition: "transform 0.3s, box-shadow 0.3s",
-              }}
-              onMouseEnter={(e) => {
-                (e.currentTarget as HTMLDivElement).style.transform = "translateY(-5px)";
-                (e.currentTarget as HTMLDivElement).style.boxShadow = "0 10px 20px rgba(0,0,0,0.5)";
-              }}
-              onMouseLeave={(e) => {
-                (e.currentTarget as HTMLDivElement).style.transform = "translateY(0)";
-                (e.currentTarget as HTMLDivElement).style.boxShadow = "none";
-              }}
-            >
-              <img
-                src={work.image}
-                alt={work.title}
-                style={{ width: "180px", height: "120px", objectFit: "cover", flexShrink: 0 }}
-              />
-              <div style={{ padding: "20px" }}>
-                <h3 style={{ margin: "0 0 10px 0", fontWeight: "400", fontSize: "18px" }}>
-                  {work.title}
-                </h3>
-                <p style={{ margin: 0, fontSize: "14px", lineHeight: "1.6" }}>
-                  {work.description}
-                </p>
+
+          <Link key={i} href={work.link} className="link">
+
+            <div ref={addToRefs} className="paper">
+
+              <div className="fold"></div>
+
+              <img src={work.image} className="thumb"/>
+
+              <h3>{work.title}</h3>
+
+              <div className="lines">
+                <span/>
+                <span/>
+                <span/>
               </div>
+
             </div>
+
           </Link>
+
         ))}
+
       </div>
+
+      <style jsx>{`
+
+        .container{
+          min-height:150vh;
+          padding:120px 40px;
+          color:#111;
+        }
+
+        .row{
+          display:flex;
+          gap:40px;
+          justify-content:center;
+          flex-wrap:wrap;
+        }
+
+        .link{
+          text-decoration:none;
+          color:inherit;
+        }
+
+        .paper{
+
+          width:220px;
+          height:260px;
+
+          background:#fffdf8;
+
+          border:1px solid #ddd;
+
+          box-shadow:
+          0 10px 20px rgba(0,0,0,.1);
+
+          padding:18px;
+
+          position:relative;
+
+          display:flex;
+          flex-direction:column;
+          gap:12px;
+
+          font-family:Georgia, serif;
+
+          transition:transform .4s ease;
+        }
+
+        .paper:hover{
+          transform:translateY(-10px) rotate(1deg);
+        }
+
+        .fold{
+
+          position:absolute;
+          top:0;
+          right:0;
+
+          width:0;
+          height:0;
+
+          border-top:40px solid #eee;
+          border-left:40px solid transparent;
+        }
+
+        .thumb{
+
+          width:100%;
+          height:100px;
+          object-fit:cover;
+
+          filter:grayscale(80%);
+        }
+
+        h3{
+          font-size:16px;
+          margin:0;
+          line-height:1.4;
+        }
+
+        .lines{
+          display:flex;
+          flex-direction:column;
+          gap:6px;
+        }
+
+        .lines span{
+          height:3px;
+          background:#bbb;
+          width:100%;
+        }
+
+        .lines span:nth-child(2){
+          width:85%;
+        }
+
+        .lines span:nth-child(3){
+          width:65%;
+        }
+
+      `}</style>
+
     </div>
+
   );
+
 }

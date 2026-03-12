@@ -98,6 +98,9 @@ export default function Home() {
           font-size:14px;
           letter-spacing:.4em;
           font-weight:200;
+          width: 200px;
+          height: 90px
+          background-color: black;
         }
 
         /* TABLET */
@@ -192,7 +195,7 @@ export default function Home() {
       </div>
 
       <div className="subText">
-        <div>KELVIN BENO</div>
+        <div className="bg-black w-[200px] h-[90px]">KELVIN BENO</div>
         <span>デベロッパー</span>
       </div>
 
